@@ -6,7 +6,7 @@
 
 #include "shaders.hpp"
 #include "textures.hpp"
-#include "transforms.hpp"
+#include "Transform.hpp"
 
 float vertices[] = {
 -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
@@ -47,6 +47,9 @@ float vertices[] = {
 -0.5f, 0.5f, -0.5f, 0.0f, 1.0f
 };
 
+Transform cubes[10];
+int cube_i=0, cube_n=10;
+
 
 void root_resize_callback(GLFWwindow* window, int width, int height) {
     if(width==height){
@@ -59,73 +62,84 @@ void root_resize_callback(GLFWwindow* window, int width, int height) {
     
 }
 
-int translateDir=transforms::NONE; //its int because | or operator returns int and wont cast automatically
-int rotateDir=transforms::NONE; //reset these back to NONE every frame
+int translateDir=Transform::NONE; //its int because | or operator returns int and wont cast automatically
+int rotateDir=Transform::NONE; //reset these back to NONE every frame
 
 void keyCallback(GLFWwindow* window,int key,int scancode,int action, int mods) { //idk what a scancode is 
 
     if(action==GLFW_PRESS){
         switch(key){ //i dont have the time to learn howto implement custom operators, and certainly not for making it for a enum, which isnt even a class type
 
+            case GLFW_KEY_1: cube_i=0; break;
+            case GLFW_KEY_2: cube_i=1; break;
+            case GLFW_KEY_3: cube_i=2; break;
+            case GLFW_KEY_4: cube_i=3; break;
+            case GLFW_KEY_5: cube_i=4; break;
+            case GLFW_KEY_6: cube_i=5; break;
+            case GLFW_KEY_7: cube_i=6; break;
+            case GLFW_KEY_8: cube_i=7; break;
+            case GLFW_KEY_9: cube_i=8; break;
+            case GLFW_KEY_0: cube_i=9; break;
+            
             case GLFW_KEY_ESCAPE:
             glfwSetWindowShouldClose(window,true);break;
 
             case GLFW_KEY_ENTER:
-            transforms::reset(); break;
+            cubes[cube_i].reset(); break;
 
             case GLFW_KEY_W:
-            rotateDir|=transforms::LEFT;break;
+            rotateDir|=Transform::LEFT;break;
             case GLFW_KEY_S:
-            rotateDir|=transforms::RIGHT;break;
+            rotateDir|=Transform::RIGHT;break;
             case GLFW_KEY_A:
-            rotateDir|=transforms::DOWN;break;
+            rotateDir|=Transform::DOWN;break;
             case GLFW_KEY_D:
-            rotateDir|=transforms::UP;break;
+            rotateDir|=Transform::UP;break;
             case GLFW_KEY_Q:
-            rotateDir|=transforms::BACK;break;
+            rotateDir|=Transform::BACK;break;
             case GLFW_KEY_E:
-            rotateDir|=transforms::FORWARD;break;
+            rotateDir|=Transform::FORWARD;break;
 
             case GLFW_KEY_UP:
-            translateDir|=transforms::UP;break;
+            translateDir|=Transform::UP;break;
             case GLFW_KEY_DOWN:
-            translateDir|=transforms::DOWN;break;
+            translateDir|=Transform::DOWN;break;
             case GLFW_KEY_LEFT:
-            translateDir|=transforms::LEFT;break;
+            translateDir|=Transform::LEFT;break;
             case GLFW_KEY_RIGHT:
-            translateDir|=transforms::RIGHT;break;
+            translateDir|=Transform::RIGHT;break;
             case GLFW_KEY_MINUS:
-            translateDir|=transforms::FORWARD;break;
+            translateDir|=Transform::FORWARD;break;
             case GLFW_KEY_EQUAL:
-            translateDir|=transforms::BACK;break;
+            translateDir|=Transform::BACK;break;
         }
     } else if(action==GLFW_RELEASE){
         switch(key){
             case GLFW_KEY_W:
-            rotateDir&=~transforms::LEFT;break;
+            rotateDir&=~Transform::LEFT;break;
             case GLFW_KEY_S:
-            rotateDir&=~transforms::RIGHT;break;
+            rotateDir&=~Transform::RIGHT;break;
             case GLFW_KEY_A:
-            rotateDir&=~transforms::DOWN;break;
+            rotateDir&=~Transform::DOWN;break;
             case GLFW_KEY_D:
-            rotateDir&=~transforms::UP;break;
+            rotateDir&=~Transform::UP;break;
             case GLFW_KEY_Q:
-            rotateDir&=~transforms::BACK;break;
+            rotateDir&=~Transform::BACK;break;
             case GLFW_KEY_E:
-            rotateDir&=~transforms::FORWARD;break;
+            rotateDir&=~Transform::FORWARD;break;
 
             case GLFW_KEY_UP:
-            translateDir&=~transforms::UP;break;
+            translateDir&=~Transform::UP;break;
             case GLFW_KEY_DOWN:
-            translateDir&=~transforms::DOWN;break;
+            translateDir&=~Transform::DOWN;break;
             case GLFW_KEY_LEFT:
-            translateDir&=~transforms::LEFT;break;
+            translateDir&=~Transform::LEFT;break;
             case GLFW_KEY_RIGHT:
-            translateDir&=~transforms::RIGHT;break;
+            translateDir&=~Transform::RIGHT;break;
             case GLFW_KEY_MINUS:
-            translateDir&=~transforms::FORWARD;break;
+            translateDir&=~Transform::FORWARD;break;
             case GLFW_KEY_EQUAL:
-            translateDir&=~transforms::BACK;break;
+            translateDir&=~Transform::BACK;break;
         }
 
     }
@@ -204,7 +218,9 @@ try{
 
     textures::init();
     shaders::init();
-    transforms::reset();
+    for(int i=0; i<cube_n;++i){
+        cubes[i].reset();
+    }
 
     //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE); //wireframe mode
 
@@ -220,10 +236,12 @@ try{
         timeCurrent=glfwGetTime();
         double deltaT=timeCurrent-timeOld;
         if(!((rotateDir+translateDir)==0)){
-            transforms::control(root,deltaT,(transforms::direction) translateDir,(transforms::direction) rotateDir);
+            cubes[cube_i].control(deltaT,(Transform::direction) translateDir,(Transform::direction) rotateDir);
         }
-        glDrawArrays(GL_TRIANGLES,0,36);
-
+        for(int i=0;i<cube_n;++i){
+            cubes[i].set();
+            glDrawArrays(GL_TRIANGLES,0,36);
+        }
         glfwSwapBuffers(root);
         glfwPollEvents();
 
