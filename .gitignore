@@ -5,5 +5,5 @@ glew-2.1.0-win32.zip
 glfw-3.3.6.bin.WIN64.zip
 glfw-3.3.6.zip
 lib
-src\main.exe
-src\main.obj
+.\src\main.exe
+.\src\main.obj
