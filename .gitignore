@@ -1,9 +1,9 @@
-.vs\
-.vscode\
+.vs
+.vscode
 book_pdf.book_pdf
 glew-2.1.0-win32.zip
 glfw-3.3.6.bin.WIN64.zip
 glfw-3.3.6.zip
-lib\
+lib
 src\main.exe
 src\main.obj
