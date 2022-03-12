@@ -12,12 +12,13 @@
 class Transform{
 
     public:
+    Transform(){};
 
-    Transform(){
-        rotation=translation=glm::mat4(1.0f);
+    Transform(glm::mat4 rs, glm::mat4 ts){
+        start_rot=rotation=rs; start_trans=translation=ts;
     }
 
-    glm::mat4 rotation,translation;
+    glm::mat4 rotation,translation,start_rot, start_trans;
     static glm::mat4 projectMat;
 
     enum direction{
@@ -40,7 +41,8 @@ class Transform{
     }
 
     void reset(){
-        rotation=translation=glm::mat4(1.0f);
+        rotation=start_rot;
+        translation=start_trans;
         glUniformMatrix4fv(shaders::uTransform,1,false,glm::value_ptr(projectMat*translation*rotation));
     }
 
