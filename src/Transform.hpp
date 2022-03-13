@@ -12,7 +12,10 @@
 class Transform{
 
     public:
-    Transform(){};
+    Transform(){
+        rotation=translation=glm::mat4(1.0f); //#TODO hide defualt constructor and figure out howto use proper one to init array of these
+    }
+
 
     Transform(glm::mat4 rs, glm::mat4 ts){
         start_rot=rotation=rs; start_trans=translation=ts;
