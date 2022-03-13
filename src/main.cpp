@@ -43,12 +43,18 @@ void keyCallback(GLFWwindow* window,int key,int scancode,int action, int mods) {
             case GLFW_KEY_8: cube_i=7; break;
             case GLFW_KEY_9: cube_i=8; break;
             case GLFW_KEY_0: cube_i=9; break;
+            case GLFW_KEY_GRAVE_ACCENT: cube_i=-1; break;
             
             case GLFW_KEY_ESCAPE:
             glfwSetWindowShouldClose(window,true);break;
 
             case GLFW_KEY_ENTER:
-            cubes[cube_i].reset(); break;
+            if(cube_i!=-1){
+                cubes[cube_i].reset(); break;
+            } else {
+                Transform::projectTranslate=Transform::projectRotate=glm::mat4(1.0f);
+                 Transform::cameraMat=Transform::projectMat;
+            }
 
             case GLFW_KEY_W:
             rotateDir|=Transform::LEFT;break;
@@ -201,7 +207,11 @@ try{
         timeCurrent=glfwGetTime();
         double deltaT=timeCurrent-timeOld;
         if(!((rotateDir+translateDir)==0)){
-            cubes[cube_i].control(deltaT,(Transform::direction) translateDir,(Transform::direction) rotateDir);
+            if(cube_i!=-1){
+                cubes[cube_i].control(deltaT,(Transform::direction) translateDir,(Transform::direction) rotateDir);
+            } else {
+                Transform::cameraControl(deltaT, (Transform::direction) translateDir, (Transform::direction) rotateDir);
+            }
         }
         for(int i=0;i<cube_n;++i){
             cubes[i].set();

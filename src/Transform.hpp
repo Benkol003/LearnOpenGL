@@ -13,7 +13,7 @@ class Transform{
 
     public:
     Transform(){
-        rotation=translation=glm::mat4(1.0f); //#TODO hide defualt constructor and figure out howto use proper one to init array of these
+        rotation=translation=glm::mat4(1.0f);
     }
 
 
@@ -22,7 +22,7 @@ class Transform{
     }
 
     glm::mat4 rotation,translation,start_rot, start_trans;
-    static glm::mat4 projectMat;
+    static glm::mat4 projectMat, projectRotate, projectTranslate, cameraMat;
 
     enum direction{
         NONE=0,
@@ -34,22 +34,23 @@ class Transform{
         BACK=1<<5,
     };
 
+    static void cameraControl(double deltaT, direction translateFlags, direction rotateFlags);
+
     void control(double deltaT, direction translateFlags, direction rotateFlags){
-        if( translateFlags!=Transform::NONE ) translation=move(deltaT,translateFlags)*translation;
-        if( rotateFlags!=Transform::NONE ) rotation=rotate(deltaT,rotateFlags)*rotation;
+        _control(deltaT, translateFlags, rotateFlags, translation, rotation);
     }
 
     void set(){
-        glUniformMatrix4fv(shaders::uTransform,1,false,glm::value_ptr(projectMat*translation*rotation));
+        glUniformMatrix4fv(shaders::uTransform,1,false,glm::value_ptr(cameraMat*translation*rotation));
     }
 
     void reset(){
         rotation=start_rot;
         translation=start_trans;
-        glUniformMatrix4fv(shaders::uTransform,1,false,glm::value_ptr(projectMat*translation*rotation));
+        glUniformMatrix4fv(shaders::uTransform,1,false,glm::value_ptr(cameraMat*translation*rotation));
     }
 
-    glm::mat4 rotate(double deltaT, direction flags) {
+    static glm::mat4 rotate(double deltaT, direction flags) {
         glm::vec3 axisVec(0.0f);
         int axisMagnitude=calcDirVec(flags,axisVec);
         glm::mat4 rotateMat(1.0f);
@@ -59,7 +60,7 @@ class Transform{
         return rotateMat;
     }
 
-   glm::mat4 move(double deltaT, direction flags) {
+   static glm::mat4 move(double deltaT, direction flags) {
         glm::vec3 dirVec;
         int dirMagnitude=calcDirVec(flags,dirVec);
         glm::mat4 translateMat(1.0f);
@@ -71,9 +72,16 @@ class Transform{
 
     static int calcDirVec(direction flags, glm::vec3 &retVec);
 
+    private:
+
+        static void _control(double deltaT, direction translateFlags, direction rotateFlags, glm::mat4 &translateMat, glm::mat4 &rotateMat);
+
 };
 
 glm::mat4 Transform::projectMat=glm::perspective(glm::radians(50.0f),1.0f,0.1f,100.0f);
+glm::mat4 Transform::projectRotate=glm::mat4(1.0f);
+glm::mat4 Transform::projectTranslate=glm::mat4(1.0f);
+glm::mat4 Transform::cameraMat=projectTranslate*projectRotate*projectMat;
 
 int Transform::calcDirVec(direction flags, glm::vec3 &retVec){
     glm::vec3 unitVec(0.0f);
@@ -105,6 +113,16 @@ int Transform::calcDirVec(direction flags, glm::vec3 &retVec){
     }
     retVec=unitVec;
     return magnitude;
+}
+
+void Transform::_control(double deltaT, direction translateFlags, direction rotateFlags, glm::mat4 &translateMat, glm::mat4 &rotateMat) {
+    if( translateFlags!=Transform::NONE ) translateMat=move(deltaT,translateFlags)*translateMat;
+    if( rotateFlags!=Transform::NONE ) rotateMat=rotate(deltaT,rotateFlags)*rotateMat;
+}
+
+void Transform::cameraControl(double deltaT, direction translateFlags, direction rotateFlags){
+    _control(deltaT,translateFlags,rotateFlags,Transform::projectTranslate, Transform::projectRotate);
+    cameraMat=projectMat*projectRotate*projectTranslate;
 }
 
 #endif
