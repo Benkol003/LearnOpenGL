@@ -50,11 +50,12 @@ void keyCallback(GLFWwindow* window,int key,int scancode,int action, int mods) {
 
             case GLFW_KEY_ENTER:
             if(cube_i!=-1){
-                cubes[cube_i].reset(); break;
+                cubes[cube_i].reset();
             } else {
                 Transform::projectTranslate=Transform::projectRotate=glm::mat4(1.0f);
                  Transform::cameraMat=Transform::projectMat;
             }
+            break;
 
             case GLFW_KEY_W:
             rotateDir|=Transform::LEFT;break;

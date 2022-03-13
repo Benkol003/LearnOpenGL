@@ -78,7 +78,7 @@ class Transform{
 
 };
 
-glm::mat4 Transform::projectMat=glm::perspective(glm::radians(50.0f),1.0f,0.1f,100.0f);
+glm::mat4 Transform::projectMat=glm::perspective(glm::radians(80.0f),1.0f,0.1f,100.0f);
 glm::mat4 Transform::projectRotate=glm::mat4(1.0f);
 glm::mat4 Transform::projectTranslate=glm::mat4(1.0f);
 glm::mat4 Transform::cameraMat=projectTranslate*projectRotate*projectMat;
