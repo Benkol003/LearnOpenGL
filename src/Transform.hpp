@@ -121,7 +121,16 @@ void Transform::_control(double deltaT, direction translateFlags, direction rota
 }
 
 void Transform::cameraControl(double deltaT, direction translateFlags, direction rotateFlags){
-    _control(deltaT,translateFlags,rotateFlags,Transform::projectTranslate, Transform::projectRotate);
+    if (translateFlags!=Transform::NONE) {
+        glm::vec3 dirVec;
+        int dirMagnitude=calcDirVec(translateFlags,dirVec);
+        if(dirMagnitude) {
+            projectTranslate=glm::translate(glm::mat4(1.0f), glm::vec3(glm::inverse(projectRotate)*glm::vec4(dirVec*(float)(50*deltaT),1.0f)))*projectTranslate;
+        }
+    }
+    if ( rotateFlags!=Transform::NONE){
+        projectRotate=rotate(deltaT, rotateFlags)*projectRotate;
+    }
     cameraMat=projectMat*projectRotate*projectTranslate;
 }
 
