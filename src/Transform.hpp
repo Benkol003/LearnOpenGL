@@ -4,7 +4,6 @@
 #include "glm/glm/glm.hpp"
 #include "glm/glm/gtc/matrix_transform.hpp"
 #include "glm/glm/gtc/type_ptr.hpp"
-#include "glm/glm/gtx/string_cast.hpp" //#RM
 #include <cmath>
 
 #include "shaders.hpp" //linting include
@@ -37,7 +36,8 @@ class Transform{
     static void cameraControl(double deltaT, direction translateFlags, direction rotateFlags);
 
     void control(double deltaT, direction translateFlags, direction rotateFlags){
-        _control(deltaT, translateFlags, rotateFlags, translation, rotation);
+        if( translateFlags!=NONE) translation=move(deltaT,translateFlags)*translation;
+        if( rotateFlags!=NONE) rotation=rotate(deltaT, rotateFlags)*rotation;
     }
 
     void set(){
@@ -71,10 +71,6 @@ class Transform{
     }
 
     static int calcDirVec(direction flags, glm::vec3 &retVec);
-
-    private:
-
-        static void _control(double deltaT, direction translateFlags, direction rotateFlags, glm::mat4 &translateMat, glm::mat4 &rotateMat);
 
 };
 
@@ -113,11 +109,6 @@ int Transform::calcDirVec(direction flags, glm::vec3 &retVec){
     }
     retVec=unitVec;
     return magnitude;
-}
-
-void Transform::_control(double deltaT, direction translateFlags, direction rotateFlags, glm::mat4 &translateMat, glm::mat4 &rotateMat) {
-    if( translateFlags!=Transform::NONE ) translateMat=move(deltaT,translateFlags)*translateMat;
-    if( rotateFlags!=Transform::NONE ) rotateMat=rotate(deltaT,rotateFlags)*rotateMat;
 }
 
 void Transform::cameraControl(double deltaT, direction translateFlags, direction rotateFlags){
