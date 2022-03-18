@@ -1,5 +1,5 @@
 # LearnOpenGL
-Code repo for learning OpenGL 3D Graphics from https://learnopengl.com/
+Code repo for learning OpenGL 3D Graphics from https://learnopengl.com/ with modifications.
 
 ### Controls
 AWSDQE for rotation control, arrow keys and +/- keys for movement or zoom.
